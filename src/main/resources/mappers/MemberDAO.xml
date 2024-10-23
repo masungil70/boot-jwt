@@ -11,5 +11,12 @@
 			#{uid}, #{pwd}, #{name}
 		)
 	</insert>
+	
+	<select id="findByUid" resultType="MemberVO">
+		select
+			*
+		from tbl_member
+		where uid = #{uid}
+	</select>
 
 </mapper>	

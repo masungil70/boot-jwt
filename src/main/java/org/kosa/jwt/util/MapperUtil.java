@@ -20,7 +20,7 @@ public class MapperUtil {
 	}
 
 	public <D> D map(Object source, Class<D> destinationType) {
-		return map(source, destinationType); 
+		return mapper.map(source, destinationType); 
 	}
 	
 }

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
@@ -46,7 +47,8 @@ public class LoginFilter extends AbstractAuthenticationProcessingFilter {
 		Map<String, String> jsonData = objectMapper.readValue(jsonText, Map.class);
 		log.info("jsonData = {}", jsonData);
 
-		return null;
+		UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(jsonData.get("uid"), jsonData.get("pwd"));
+		return getAuthenticationManager().authenticate(authenticationToken);
 	}
 	
 	

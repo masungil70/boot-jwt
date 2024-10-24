@@ -1,15 +1,10 @@
 package org.kosa.jwt;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.kosa.jwt.dto.MemberDTO;
-import org.kosa.jwt.util.MapperUtil;
 import org.kosa.jwt.vo.MemberVO;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -27,9 +22,13 @@ public class MemberDetailsService implements UserDetailsService {
 	
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+		log.info("username = {}", username);
 		Optional<MemberVO> optional = memberDAO.findByUid(username);
 		MemberVO memberVO = optional.orElseThrow(() -> new UsernameNotFoundException("멤버 아이디를 찾을 수 없습니다"));
-		return MemberDTO.of(memberVO);
+		log.info("memberVO = {}", memberVO);
+		MemberDTO memberDTO = MemberDTO.of(memberVO);
+		log.info("memberDTO = {}", memberDTO);
+		return memberDTO;
 	}
 
 }

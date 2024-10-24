@@ -12,7 +12,6 @@ import lombok.ToString;
 
 @Getter
 @Setter
-@ToString
 public class MemberDTO extends User {
 	private String uid;
 	private String pwd;
@@ -33,4 +32,12 @@ public class MemberDTO extends User {
 		
 		return memberDTO; 
 	}
+
+	@Override
+	public String toString() {
+		return "MemberDTO [uid=" + uid + ", pwd=" + pwd + ", name=" + name + ", uuid=" + uuid + ", toString()="
+				+ super.toString() + "]";
+	}
+	
+	
 }

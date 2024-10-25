@@ -26,6 +26,11 @@ public class LoginFilter extends AbstractAuthenticationProcessingFilter {
 	public LoginFilter(String defaultFilterPrrocessingUrl) {
 		super(defaultFilterPrrocessingUrl);
 		this.objectMapper = new ObjectMapper();
+
+		//로그인 성공시 처리 핸들러 등록  
+		this.setAuthenticationSuccessHandler((request, response, authentication) -> {
+			log.info("로그인 성공시 처리 핸들러 ............." );
+		});
 	}
 
 	@Override

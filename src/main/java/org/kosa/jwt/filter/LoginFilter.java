@@ -31,6 +31,10 @@ public class LoginFilter extends AbstractAuthenticationProcessingFilter {
 		this.setAuthenticationSuccessHandler((request, response, authentication) -> {
 			log.info("로그인 성공시 처리 핸들러 ............." );
 		});
+		//로그인 실패시 처리 핸들러 등록  
+		this.setAuthenticationFailureHandler((request, response, exception) -> {
+			log.info("로그인 실패시 처리 핸들러 등록 ............." );
+		});
 	}
 
 	@Override

@@ -9,6 +9,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -58,7 +59,8 @@ public class JWTUtil {
 		                .header().add(valueMap) //헤더 부분
 		                .and().claims(payloads) //payload 부분 설정
 		                .issuedAt(Date.from(ZonedDateTime.now().toInstant())) //JWT 발급시간 설정 
-		                .expiration(Date.from(ZonedDateTime.now().plusMinutes(time).toInstant())) //만료기간 설정 
+//		                .expiration(Date.from(ZonedDateTime.now().plusMinutes(time).toInstant())) //만료기간 설정 
+		                .expiration(Date.from(ZonedDateTime.now().plusDays(time).toInstant())) //만료기간 설정
 		                .signWith(Keys.hmacShaKeyFor(getSecretKey()), Jwts.SIG.HS256)
 		                .compact();
 		
@@ -75,6 +77,13 @@ public class JWTUtil {
 
         Map<String, Object> claim = null;
 
+        //인증 토큰 문자열을 이용하여 클래임 객체를 얻는다
+        claim = Jwts.parser()
+        		.verifyWith(Keys.hmacShaKeyFor(getSecretKey()))
+  				.build()
+  				.parseSignedClaims(token)
+  				.getPayload();
+      		
         return claim;
     }
 

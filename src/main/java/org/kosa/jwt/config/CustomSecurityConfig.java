@@ -3,6 +3,8 @@ package org.kosa.jwt.config;
 
 import org.kosa.jwt.MemberDetailsService;
 import org.kosa.jwt.filter.LoginFilter;
+import org.kosa.jwt.security.filter.TokenCheckFilter;
+import org.kosa.jwt.util.JWTUtil;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,7 +32,8 @@ import lombok.extern.log4j.Log4j2;
 public class CustomSecurityConfig {
 
 	
-	private final MemberDetailsService memberDetailsService; 
+	private final MemberDetailsService memberDetailsService;
+	private final JWTUtil jwtUtil;
 	
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -67,13 +70,16 @@ public class CustomSecurityConfig {
         //http 보안 객체에 인증관리자를 설정한다 
         http.authenticationManager(authenticationManager);
         
-        LoginFilter loginFilter = new LoginFilter("/generateToken");
+        //해당 소스 작성후 : 브라우저에서 /generateToken URL을 실행한다
+        final LoginFilter loginFilter = new LoginFilter("/generateToken", jwtUtil);
         loginFilter.setAuthenticationManager(authenticationManager);
         
         //UsernamePasswordAuthenticationFilter 필더 객체 실행 전에 동작할 loginFilter를 설정한다 
         http.addFilterBefore(loginFilter, UsernamePasswordAuthenticationFilter.class);
-        
-        //해당 소스 작성후 : 브라우저에서 /generateToken URL을 실행한다
+
+        //UsernamePasswordAuthenticationFilter 필더 객체 실행 전에 동작할 TokenCheckFilter 객체를 생성하여 설정한다
+        //해당 소스 작성후 : 브라우저에서 /api/sample/test URL을 실행한다
+        http.addFilterBefore(new TokenCheckFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
         
         //csrf 비활성화 
         http.csrf(csrf -> csrf.disable());

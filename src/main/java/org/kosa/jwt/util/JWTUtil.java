@@ -9,10 +9,8 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 
@@ -27,6 +25,7 @@ public class JWTUtil {
     
 	public byte[] getSecretKey() {
 		try {
+			log.info("key = {}", key);
 			return Base64.getEncoder().encode(key.getBytes("UTF-8"));
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -49,10 +48,10 @@ public class JWTUtil {
         payloads.putAll(valueMap);
 
         //테스트 시에는 짧은 유효 기간
-        //int time = (1) * days; //테스트는 분단위로 나중에 60*24 (일)단위변경
+        int time = (1) * days; //테스트는 분단위로 나중에 60*24 (일)단위변경
 
         //10분 단위로 조정
-        int time = (10) * days; //테스트는 분단위로 나중에 60*24 (일)단위변경
+        //int time = (10) * days; //테스트는 분단위로 나중에 60*24 (일)단위변경
         
         try {
 		        String jwtStr = Jwts.builder()

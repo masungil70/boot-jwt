@@ -3,6 +3,7 @@ package org.kosa.jwt.config;
 
 import org.kosa.jwt.MemberDetailsService;
 import org.kosa.jwt.filter.LoginFilter;
+import org.kosa.jwt.filter.RefreshTokenFilter;
 import org.kosa.jwt.filter.TokenCheckFilter;
 import org.kosa.jwt.util.JWTUtil;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
@@ -84,6 +85,10 @@ public class CustomSecurityConfig {
         //해당 소스 작성후 : 브라우저에서 /api/sample/test URL을 실행한다
         http.addFilterBefore(new TokenCheckFilter(jwtUtil, memberDetailsService), UsernamePasswordAuthenticationFilter.class);
         
+        //TokenCheckFilter 필더 객체 실행 전에 동작할 RefreshTokenFilter 객체를 생성하여 설정한다
+        //해당 소스 작성후 : 브라우저에서 /refreshToken URL을 실행한다
+        http.addFilterBefore(new RefreshTokenFilter("/refreshToken", jwtUtil), TokenCheckFilter.class);
+
         //csrf 비활성화 
         http.csrf(csrf -> csrf.disable());
         //세션을 사용하지 않음  

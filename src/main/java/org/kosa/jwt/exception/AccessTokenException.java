@@ -12,9 +12,9 @@ import jakarta.servlet.http.HttpServletResponse;
 
 public class AccessTokenException extends RuntimeException {
 	private static final long serialVersionUID = 6700540792675034138L;
+	private static ObjectMapper objectMapper = new ObjectMapper(); 
 	
 	TOKEN_ERROR token_error;
-	static ObjectMapper objectMapper = new ObjectMapper(); 
 
     public enum TOKEN_ERROR {
         UNACCEPT(401,"Token is null or too short"),

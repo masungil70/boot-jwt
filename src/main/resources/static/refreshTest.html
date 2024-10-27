@@ -1,0 +1,53 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<h1>ACCESS TOKEN</h1>
+<h3 class="accessOld"></h3>
+<h3 class="accessResult"></h3>
+<hr/>
+
+<h1>REFRESH TOKEN</h1>
+<h3 class="refreshOld"></h3>
+<h3 class="refreshResult"></h3>
+
+<button id="refreshButton">Refresh</button>
+
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+    const oldAccessToken = localStorage.getItem("accessToken")
+    const oldRefreshToken = localStorage.getItem("refreshToken")
+
+    document.querySelector(".accessOld").innerHTML = oldAccessToken
+    document.querySelector(".refreshOld").innerHTML = oldRefreshToken
+
+    document.querySelector("#refreshButton").addEventListener("click", () => {
+        axios.post('http://localhost:8080/refreshToken',
+            {accessToken: oldAccessToken, refreshToken: oldRefreshToken})
+            .then(res => {
+                console.log(res.data)
+
+                const {accessToken, refreshToken } = res.data;
+
+                document.querySelector(".accessResult").innerHTML =
+                    oldAccessToken !== accessToken ? accessToken : 'OLD'
+                document.querySelector(".refreshResult").innerHTML =
+                    oldRefreshToken !== refreshToken ? refreshToken : 'OLD'
+            })
+            .catch(error => {
+                console.error(error)
+            }
+        )
+
+    },false)
+
+
+</script>
+
+</body>
+</html>

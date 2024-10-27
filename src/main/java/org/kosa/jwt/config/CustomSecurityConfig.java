@@ -87,7 +87,7 @@ public class CustomSecurityConfig {
         
         //TokenCheckFilter 필더 객체 실행 전에 동작할 RefreshTokenFilter 객체를 생성하여 설정한다
         //해당 소스 작성후 : 브라우저에서 /refreshToken URL을 실행한다
-        http.addFilterBefore(new RefreshTokenFilter("/refreshToken", jwtUtil), TokenCheckFilter.class);
+        http.addFilterBefore(new RefreshTokenFilter("/refreshToken", objectMapper, jwtUtil), TokenCheckFilter.class);
 
         //csrf 비활성화 
         http.csrf(csrf -> csrf.disable());

@@ -19,9 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 public class JWTUtil {
     @Value("${org.kosa.jwt.secret}")
     private String key; // 서버만 알고 있는 비밀키값
-	int EXPIRATION_TIME = 2 * 60 * 1000; //1분짜리 토큰,  10일 (1/1000초)
-	String TOKEN_PREFIX = "Bearer ";
-	String HEADER_STRING = "Authorization";
     
 	public byte[] getSecretKey() {
 		try {
@@ -58,8 +55,8 @@ public class JWTUtil {
 		                .header().add(valueMap) //헤더 부분
 		                .and().claims(payloads) //payload 부분 설정
 		                .issuedAt(Date.from(ZonedDateTime.now().toInstant())) //JWT 발급시간 설정 
-//		                .expiration(Date.from(ZonedDateTime.now().plusMinutes(time).toInstant())) //만료기간 설정 
-		                .expiration(Date.from(ZonedDateTime.now().plusDays(time).toInstant())) //만료기간 설정
+		                .expiration(Date.from(ZonedDateTime.now().plusMinutes(time).toInstant())) //만료기간 설정 
+//		                .expiration(Date.from(ZonedDateTime.now().plusDays(time).toInstant())) //만료기간 설정
 		                .signWith(Keys.hmacShaKeyFor(getSecretKey()), Jwts.SIG.HS256)
 		                .compact();
 		

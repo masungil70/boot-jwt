@@ -25,9 +25,9 @@ public class LoginFilter extends AbstractAuthenticationProcessingFilter {
 	private final ObjectMapper objectMapper;
 	private final JWTUtil jwtUtil;
 	
-	public LoginFilter(String defaultFilterPrrocessingUrl, JWTUtil jwtUtil) {
+	public LoginFilter(String defaultFilterPrrocessingUrl, ObjectMapper objectMapper, JWTUtil jwtUtil) {
 		super(defaultFilterPrrocessingUrl);
-		this.objectMapper = new ObjectMapper();
+		this.objectMapper = objectMapper;
 		this.jwtUtil = jwtUtil;
 
 		//로그인 성공시 처리 핸들러 등록  

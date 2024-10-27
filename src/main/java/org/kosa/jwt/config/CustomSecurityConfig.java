@@ -3,7 +3,7 @@ package org.kosa.jwt.config;
 
 import org.kosa.jwt.MemberDetailsService;
 import org.kosa.jwt.filter.LoginFilter;
-import org.kosa.jwt.security.filter.TokenCheckFilter;
+import org.kosa.jwt.filter.TokenCheckFilter;
 import org.kosa.jwt.util.JWTUtil;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -20,6 +20,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -32,8 +34,9 @@ import lombok.extern.log4j.Log4j2;
 public class CustomSecurityConfig {
 
 	
-	private final MemberDetailsService memberDetailsService;
+	private final ObjectMapper objectMapper;
 	private final JWTUtil jwtUtil;
+	private final MemberDetailsService memberDetailsService;
 	
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -71,7 +74,7 @@ public class CustomSecurityConfig {
         http.authenticationManager(authenticationManager);
         
         //해당 소스 작성후 : 브라우저에서 /generateToken URL을 실행한다
-        final LoginFilter loginFilter = new LoginFilter("/generateToken", jwtUtil);
+        final LoginFilter loginFilter = new LoginFilter("/generateToken", objectMapper, jwtUtil);
         loginFilter.setAuthenticationManager(authenticationManager);
         
         //UsernamePasswordAuthenticationFilter 필더 객체 실행 전에 동작할 loginFilter를 설정한다 
@@ -79,7 +82,7 @@ public class CustomSecurityConfig {
 
         //UsernamePasswordAuthenticationFilter 필더 객체 실행 전에 동작할 TokenCheckFilter 객체를 생성하여 설정한다
         //해당 소스 작성후 : 브라우저에서 /api/sample/test URL을 실행한다
-        http.addFilterBefore(new TokenCheckFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(new TokenCheckFilter(jwtUtil, memberDetailsService), UsernamePasswordAuthenticationFilter.class);
         
         //csrf 비활성화 
         http.csrf(csrf -> csrf.disable());

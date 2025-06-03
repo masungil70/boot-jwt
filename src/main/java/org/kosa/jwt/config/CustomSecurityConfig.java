@@ -51,8 +51,6 @@ public class CustomSecurityConfig {
 
         return (web) -> web.ignoring()
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations());
-
-
     }
 
     @Bean

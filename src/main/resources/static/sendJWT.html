@@ -1,0 +1,99 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>JWT 테스트</h1>
+
+<div class="result"></div>
+
+<button class="btn1">CALL SERVER</button>
+
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+<script>
+const callServer = async() => {
+    console.log("call server 1...")
+
+    const accessToken = localStorage.getItem("accessToken")
+
+    if(!accessToken) {
+        throw 'Cannot Find Access Token'
+    }
+    
+    const authHeader = {"Authorization": `Bearer ${accessToken}`}
+    try {
+        const res = await axios.get("http://localhost:8080/api/sample/doA",
+            {headers: authHeader})
+        return res.data
+    }catch(err) {
+
+        if(err.response.data.msg === 'Expired Token'){
+            console.log("Refresh Your Token")
+
+            try{
+                callRefresh(data=>{
+                    console.log("new tokens....saved..")
+                    return callServer();
+                }, () => {
+                	console.log("인증 기간 만료로 다시 로그인 해야한다");
+                })
+
+            }catch(refreshErr){
+            	console.log("refreshErr", refreshErr)
+                throw refreshErr.response.data.msg
+            }
+        }//end if
+    }
+    
+}
+
+//successCallback : 성공시 실행할 함수 
+//failedCallback : 실패시 실행할 함수
+const callRefresh = async (successCallback, failedCallback) => {
+
+    const accessToken = localStorage.getItem("accessToken")
+    const refreshToken = localStorage.getItem("refreshToken")
+
+    console.log("callRefresh---------");
+
+    const tokens = {accessToken, refreshToken}
+    axios.post("http://localhost:8080/refreshToken", tokens)
+    	 .then(res => {
+   			console.log("data", res.data);
+    		localStorage.setItem("accessToken", res.data.accessToken)
+    		localStorage.setItem("refreshToken", res.data.refreshToken)
+    		if (successCallback) {
+    			successCallback(res.data);
+    		}
+    	 })
+    	 .catch(err => {
+   			console.log("err", err);
+       		if (err.response.data.msg == "OLD_REFRESH") { 
+       			if (failedCallback) {
+           			console.log("다시 로그인 해주세요2 ");
+           			failedCallback();
+       			}
+       		}
+    	 });
+}
+
+
+const resultDiv = document.querySelector(".result")
+
+document.querySelector(".btn1").addEventListener("click", () => {
+
+    callServer().then(result => {
+        console.log(result)
+    }).catch(error => {
+        alert(error)
+    })
+},false)
+
+</script>
+
+</body>
+</html>

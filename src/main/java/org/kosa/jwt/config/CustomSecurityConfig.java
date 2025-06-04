@@ -92,6 +92,19 @@ public class CustomSecurityConfig {
         //세션을 사용하지 않음  
         http.sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
+		http.authorizeHttpRequests(authroize -> 
+			authroize.requestMatchers("/api/sample/**")
+				.hasAnyAuthority("ROLE_USER", "ROLE_MANAGER", "ROLE_ADMIN") //여러개의 권한 중 하나라도 있으면 성공 
+				.requestMatchers("/api/v1/user/**")
+				.hasAnyAuthority("ROLE_USER", "ROLE_MANAGER", "ROLE_ADMIN") //여러개의 권한 중 하나라도 있으면 성공
+				.requestMatchers("/api/v1/manager/**")
+				.hasAnyAuthority("ROLE_MANAGER","ROLE_ADMIN")
+				.requestMatchers("/api/v1/admin/**")
+				.hasAnyAuthority("ROLE_ADMIN") //반드시 해당 권한만 허가  
+				.anyRequest().permitAll() // /home url은 비회원이 사용할 수 있음 
+			);
+
+        
         return http.build();
 
     }

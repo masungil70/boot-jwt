@@ -34,6 +34,10 @@ public class MemberDAOTests {
 //
 //            memberDAO.insert(memberVO);
 //        });
+//  //apiuser0 의 사용자 역할을 USER,ADMIN으로 변경한다  
+//  //apiuser1 의 사용자 역할을 USER 으로 변경한다  
+//  //apiuser2 의 사용자 역할을 MANAGER 으로 변경한다  
+//  //apiuser3 의 사용자 역할을 ADMIN 으로 변경한다  
 //    }
     
     @Test

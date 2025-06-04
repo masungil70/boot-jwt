@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>Axios 인터셉터를 구현하는 방법</h1>
+
+<button class="btn1">CALL SERVER</button><br/>
+결과 : <span class="result"></span>
+
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="js/kosa_axios.js"></script>
+
+<script>
+
+const resultDiv = document.querySelector(".result")
+
+document.querySelector(".btn1")
+	.addEventListener("click", e => {
+        kosa_axios.get("http://localhost:8080/api/sample/doA")
+        	.then(res => {
+    	        console.log('GET result:', res.data);
+    	        //결과 출력 
+    	        resultDiv.innerHTML = res.data; 
+        	}) 
+	    	.catch(err => {
+	        	console.error('GET error:', err);
+	    	})
+	})
+
+</script>
+
+</body>
+</html>

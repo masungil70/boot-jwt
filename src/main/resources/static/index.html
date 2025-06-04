@@ -1,0 +1,177 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>로그인 Rest api 테스트</h1>
+<a href="login.html">로그인(jwt)</a><br/>
+<a href="/api/sample/doA">api/sample/doA 직접호출(오류발생)</a><br/>
+<button id="apiCallError">자바크스립트로 API 호출(토큰전달하지않음)</button><br/>
+<button id="apiCallSuccess">자바크스립트로 API 호출(토큰전달)</button><br/>
+<button id="refreshTest">refresh 토큰 얻기</button><br/>
+<a href="/kosa_axios.html">Axios 인터셉터를 구현하는 방법</a><br/>
+<a href="/kosa_fetch.html">fetch를 사용하여 구현하는 방법</a><br/>
+
+<h1>ACCESS TOKEN</h1>
+<h3 class="accessOld"></h3>
+<h3 class="accessResult"></h3>
+<hr/>
+
+<h1>REFRESH TOKEN</h1>
+<h3 class="refreshOld"></h3>
+<h3 class="refreshResult"></h3>
+
+결과 : <span class="result"></span>
+
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+<script>
+	//실행 결과 출력하기 위한 객체 
+	const resultDiv = document.querySelector(".result")
+
+	// 자바크스립트로 API 호출(토큰전달하지않음)
+    async function callTest(){
+        const response = await axios.get("http://localhost:8080/api/sample/doA")
+        return response.data
+    }
+
+	document.querySelector("#apiCallError").addEventListener("click", () => {
+        //함수 호출 전 결과 출력 초기화 
+		resultDiv.innerHTML = "";
+
+        //서버 api 함수 호출 
+	    callTest()
+        .then(data => {
+        	console.log(data);
+	        resultDiv.innerHTML = data; 
+        })
+        .catch(e => console.log(e));
+	})	
+
+	
+	
+	//서버 API 함수 호출 
+	const callServer = async() => {
+        //함수 호출 전 결과 출력 초기화 
+		resultDiv.innerHTML = "";
+        
+	    console.log("call server 1...")
+
+	    const accessToken = localStorage.getItem("accessToken")
+
+	    if(!accessToken) {
+	        throw 'Cannot Find Access Token'
+	    }
+	    
+	    const authHeader = {"Authorization": `Bearer ${accessToken}`}
+	    try {
+	        const res = await axios.get("http://localhost:8080/api/sample/doA", {headers: authHeader});
+	        //화면에 결과 출력 
+	        resultDiv.innerHTML = res.data; 
+	        return res.data;
+	    }catch(err) {
+
+	        if(err.response.data.msg === 'Expired Token'){
+	            console.log("Refresh Your Token")
+	            try{
+	            	//token 만료로 인하여 token 재발급하는 함수 호출 
+	                callRefresh(data=>{
+	                    console.log("new tokens....saved..")
+	                    return callServer();
+	                }, () => {
+	                	console.log("인증 기간 만료로 다시 로그인 해야한다");
+	                })
+
+	            }catch(refreshErr){
+	            	console.log("refreshErr", refreshErr)
+	                throw refreshErr.response.data.msg
+	            }
+	        }//end if
+	    }
+	    
+	}
+
+	//successCallback : 성공시 실행할 함수 
+	//failedCallback : 실패시 실행할 함수
+	const callRefresh = async (successCallback, failedCallback) => {
+
+	    const accessToken = localStorage.getItem("accessToken")
+	    const refreshToken = localStorage.getItem("refreshToken")
+
+	    console.log("callRefresh---------");
+
+	    const tokens = {accessToken, refreshToken}
+	    axios.post("http://localhost:8080/refreshToken", tokens)
+	    	 .then(res => {
+	   			console.log("data", res.data);
+	    		localStorage.setItem("accessToken", res.data.accessToken)
+	    		localStorage.setItem("refreshToken", res.data.refreshToken)
+	    		if (successCallback) {
+	    			successCallback(res.data);
+	    		}
+	    	 })
+	    	 .catch(err => {
+	   			console.log("err", err);
+	       		if (err.response.data.msg == "OLD_REFRESH") { 
+	       			if (failedCallback) {
+	           			console.log("다시 로그인 해주세요2 ");
+	           			failedCallback();
+	       			}
+	       		}
+	    	 });
+	}
+
+
+	document.querySelector("#apiCallSuccess").addEventListener("click", () => {
+        //함수 호출 전 결과 출력 초기화 
+		resultDiv.innerHTML = "";
+        
+		//서버 api 함수 호출 
+	    callServer().then(result => {
+	        console.log(result)
+	        //화면에 결과 출력 
+	        resultDiv.innerHTML = result; 
+	    }).catch(error => {
+	        alert(error)
+	    })
+	})	
+	
+    const oldAccessToken = localStorage.getItem("accessToken")
+    const oldRefreshToken = localStorage.getItem("refreshToken")
+
+    document.querySelector(".accessOld").innerHTML = oldAccessToken
+    document.querySelector(".refreshOld").innerHTML = oldRefreshToken
+
+    document.querySelector("#refreshTest").addEventListener("click", () => {
+        axios.post('http://localhost:8080/refreshToken',
+            {accessToken: oldAccessToken, refreshToken: oldRefreshToken})
+            .then(res => {
+                console.log(res.data)
+
+                const {accessToken, refreshToken } = res.data;
+
+                document.querySelector(".accessResult").innerHTML =
+                    oldAccessToken !== accessToken ? accessToken : 'OLD'
+                document.querySelector(".refreshResult").innerHTML =
+                    oldRefreshToken !== refreshToken ? refreshToken : 'OLD'
+
+                //accessToken, refreshToken를 새롭게 저장한다
+                localStorage.setItem("accessToken", accessToken)
+                localStorage.setItem("refreshToken", refreshToken)
+                    		
+            })
+            .catch(error => {
+                console.error(error)
+            }
+        )
+
+    },false)	
+	
+	
+</script>
+
+</body>
+</html>

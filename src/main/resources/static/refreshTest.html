@@ -15,7 +15,7 @@
 <h1>REFRESH TOKEN</h1>
 <h3 class="refreshOld"></h3>
 <h3 class="refreshResult"></h3>
-
+6분뒤 Refresh 버튼을 클릭하여 토큰을 재발급 하여 테스트 한다  
 <button id="refreshButton">Refresh</button>
 
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
@@ -38,6 +38,11 @@
                     oldAccessToken !== accessToken ? accessToken : 'OLD'
                 document.querySelector(".refreshResult").innerHTML =
                     oldRefreshToken !== refreshToken ? refreshToken : 'OLD'
+
+                //accessToken, refreshToken를 새롭게 저장한다
+                localStorage.setItem("accessToken", accessToken)
+                localStorage.setItem("refreshToken", refreshToken)
+                    		
             })
             .catch(error => {
                 console.error(error)

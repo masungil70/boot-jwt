@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
+import org.kosa.jwt.dto.MemberDTO;
 import org.kosa.jwt.util.JWTUtil;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -36,9 +37,11 @@ public class LoginFilter extends AbstractAuthenticationProcessingFilter {
 			log.info("로그인 성공시 처리 핸들러 ............." );
 			log.info("인증된 로그인 정보 : {}", authentication);
 			log.info("인증된 로그인 아이디 : {}", authentication.getName());
+			MemberDTO memberDTO = (MemberDTO) authentication.getPrincipal();
+			log.info("memberDTO : {}", memberDTO.toString());
 			
 			//JWT에 추가할 정보로 아이디가 있는 Map 객체를 생성한다
-			final Map<String, Object> claim = Map.of("uid", authentication.getName());
+			final Map<String, Object> claim = Map.of("uid", authentication.getName(), "name", memberDTO.getName());
 			
 			Map<String, String> keyMap = Map.of("accessToken", jwtUtil.generateToken(claim, 10), //Access Token 유효기간 1일로 생성
 												"refreshToken", jwtUtil.generateToken(claim, 50)); //Refresh Token 유효기간 10일로 생성
